@@ -9,7 +9,7 @@ const port = 3002;
 app.use(express.json());
 
 const { usersModel, boardModel, boardMemeberModel, listModel, cardModel, checkListModel, commentModel } = require('./models')
-const { auth } = require('./authmiddleware')
+const { authMiddleWare } = require('./authmiddleware')
 
 app.get('/', (req, res) => {
     res.send('working!!')
@@ -49,7 +49,7 @@ app.post('/signup', async (req, res) => {
 });
 
 
-app.post('/signin', (req, res) => {
+app.post('/signin', async (req, res) => {
     const username = req.body.username;
     const password = req.body.password;
 
@@ -59,10 +59,11 @@ app.post('/signin', (req, res) => {
         })
     }
 
-    const user = usersModel.findOne({
+    const user = await usersModel.findOne({
         username,password
     })
 
+    
     if(!user){
         return res.status(401).json({
             message: "Invalid credentials"
@@ -82,20 +83,20 @@ app.post('/signin', (req, res) => {
 
 })
 
-app.get('/getAllBoards', auth, async(req, res) => {
-    // const userId = req.userId;
-    // const user = await usersModel.findById(userId);
+app.get('/getAllBoards', authMiddleWare, async(req, res) => {
+    const userId = req.userId;
+    const user = await usersModel.findById(userId);
 
-    // if(!user){
-    //     return res.status(401).json({
-    //         message: "user does not exist"
-    //     })
-    // }else{
-    //     res.status(200).json({
-    //         user
-    //     })
-    // }
-    res.send('working!')
+    if(!user){
+        return res.status(401).json({
+            message: "user does not exist"
+        })
+    }else{
+        res.status(200).json({
+            message: "success!"
+        })
+    }
+    
 })
 
 app.listen(port, (req, res) => {

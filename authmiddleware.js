@@ -13,9 +13,9 @@ function authMiddleWare(req, res, next) {
     try {
         const decoded = jwt.verify(token, process.env.JWT_KEY)
         const userId = decoded.userId;
-
+        
         if (!userId) {
-            return res.json(401).json({
+            return res.status(401).json({
                 message: "malformed token"
             })
         } else {
