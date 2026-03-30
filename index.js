@@ -1,4 +1,6 @@
 const chalk = require('chalk');
+const jwt = require('jsonwebtoken');
+require('dotenv').config();
 
 const express = require('express');
 const app = express()
@@ -15,6 +17,12 @@ app.get('/', (req, res) => {
 app.post('/signup', async (req, res) => {
     const username = req.body.username;
     const password = req.body.password;
+
+    if(!username || !password){
+        return res.status(400).json({
+            message : "Missing credentials"
+        })
+    }
 
     const user = await usersModel.findOne({
         username
@@ -37,6 +45,38 @@ app.post('/signup', async (req, res) => {
         message : "user createded",
         userId: newUser._id
     })
+});
+
+
+app.post('/signin', (req, res) => {
+    const username = req.body.username;
+    const password = req.body.password;
+
+    if(!username || !password){
+        return res.status(400).json({
+            message : "Missing credentials"
+        })
+    }
+
+    const user = usersModel.findOne({
+        username,password
+    })
+
+    if(!user){
+        return res.status(401).json({
+            message: "Invalid credentials"
+        })
+    }
+
+    const token = jwt.sign({
+        username
+    }, process.env.JWT_KEY)
+
+    res.json({
+        token
+    })
+
+
 })
 
 app.listen(port, (req, res) => {
