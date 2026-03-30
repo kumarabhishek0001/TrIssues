@@ -9,6 +9,7 @@ const port = 3002;
 app.use(express.json());
 
 const { usersModel, boardModel, boardMemeberModel, listModel, cardModel, checkListModel, commentModel } = require('./models')
+const { auth } = require('./authmiddleware')
 
 app.get('/', (req, res) => {
     res.send('working!!')
@@ -68,8 +69,10 @@ app.post('/signin', (req, res) => {
         })
     }
 
+    const userId = user._id
+
     const token = jwt.sign({
-        username
+        userId
     }, process.env.JWT_KEY)
 
     res.json({
@@ -77,6 +80,22 @@ app.post('/signin', (req, res) => {
     })
 
 
+})
+
+app.get('/getAllBoards', auth, async(req, res) => {
+    // const userId = req.userId;
+    // const user = await usersModel.findById(userId);
+
+    // if(!user){
+    //     return res.status(401).json({
+    //         message: "user does not exist"
+    //     })
+    // }else{
+    //     res.status(200).json({
+    //         user
+    //     })
+    // }
+    res.send('working!')
 })
 
 app.listen(port, (req, res) => {
