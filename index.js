@@ -14,14 +14,16 @@ const { authMiddleWare } = require('./authmiddleware')
 app.get('/', (req, res) => {
     res.send('working!!')
 })
+// CREATE ENDPOINTS
+// SIGN UP, SIGN IN, CREATE BOARD, CREATE LIST, CREATE CARD, CREATE CHECKLIST, ADD COMMENT
 
 app.post('/signup', async (req, res) => {
     const username = req.body.username;
     const password = req.body.password;
 
-    if(!username || !password){
+    if (!username || !password) {
         return res.status(400).json({
-            message : "Missing credentials"
+            message: "Missing credentials"
         })
     }
 
@@ -29,7 +31,7 @@ app.post('/signup', async (req, res) => {
         username
     });
 
-    if(user){
+    if (user) {
         return res.status(409).json({
             message: "User already exists"
         })
@@ -39,11 +41,11 @@ app.post('/signup', async (req, res) => {
         username,
         password,
     }
-    
+
     const newUser = await usersModel.create(userData);
 
     res.status(201).json({
-        message : "user createded",
+        message: "user createded",
         userId: newUser._id
     })
 });
@@ -53,18 +55,18 @@ app.post('/signin', async (req, res) => {
     const username = req.body.username;
     const password = req.body.password;
 
-    if(!username || !password){
+    if (!username || !password) {
         return res.status(400).json({
-            message : "Missing credentials"
+            message: "Missing credentials"
         })
     }
 
     const user = await usersModel.findOne({
-        username,password
+        username, password
     })
 
-    
-    if(!user){
+
+    if (!user) {
         return res.status(401).json({
             message: "Invalid credentials"
         })
@@ -83,20 +85,49 @@ app.post('/signin', async (req, res) => {
 
 })
 
-app.get('/getAllBoards', authMiddleWare, async(req, res) => {
+app.post('/createBoard', authMiddleWare, async (req, res) => {
     const userId = req.userId;
+    // console.log(userId);
     const user = await usersModel.findById(userId);
+    // console.log(user)
 
-    if(!user){
+    const boardName = req.body.boardName;
+    const isPublic = req.body.isPublic;
+
+    if (!user) {
+        // USER DOES NOT EXIST
         return res.status(401).json({
             message: "user does not exist"
         })
-    }else{
-        res.status(200).json({
-            message: "success!"
-        })
+    } else {
+        // USER EXIST, SO WE CAN CREATE A BOARD 
+        const boardData = {
+            boardName,
+            userId,
+            isPublic
+        }
+
+        try {
+
+            const newBoard = await boardModel.create(boardData);
+
+            res.status(201).json({
+                message: "success",
+                // boardId: newBoard._id,
+                // "board name": newBoard.boardName,
+                // "createdAt": newBoard.createdAt,
+                // "is Public": newBoard.isPublic,
+                // "created by": newBoard.userId
+            })
+
+        } catch (error) {
+            console.log(chalk.red('Failed to create user board'));
+            console.log(error);
+        }
+
+
     }
-    
+
 })
 
 app.listen(port, (req, res) => {
