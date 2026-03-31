@@ -49,6 +49,8 @@ const listSchema = mongoose.Schema({
     position: Number
 })
 
+listSchema.index({boardId: 1, listName: 1}, {unique: true});
+
 // CARD
 const cardSchema = mongoose.Schema({
     listId: mongoose.Types.ObjectId,
