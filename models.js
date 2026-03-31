@@ -32,7 +32,7 @@ const boardSchema = mongoose.Schema({
     createdAt: {type: Date, default: Date.now}
 });
 
-
+boardSchema.index({userId: 1, boardName: 1}, {unique: true});
 
 // BOARD MEMBERS
 const boardMemberSchema = mongoose.Schema({

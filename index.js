@@ -107,6 +107,18 @@ app.post('/createBoard', authMiddleWare, async (req, res) => {
             isPublic
         }
 
+        // // CHECK OF BOARD WITH SAME NAME EXIST
+        // const boardExist = await boardModel.findOne({
+        //     boardName,
+        //     userId,
+        // })
+
+        // if(boardExist){
+        //     return res.status(409).json({
+        //         message: "same board name already exist"
+        //     })
+        // }
+
         try {
 
             const newBoard = await boardModel.create(boardData);
@@ -122,7 +134,17 @@ app.post('/createBoard', authMiddleWare, async (req, res) => {
 
         } catch (error) {
             console.log(chalk.red('Failed to create user board'));
-            console.log(error);
+
+            if(error.code === 11000){
+                console.log(chalk.red('Board alread exist'))
+                return res.status(400).json({
+                    message: "Board already exist"
+                })
+            }
+            
+            return res.status(400).json({
+                message: "error occured while creating board"
+            })
         }
 
 
